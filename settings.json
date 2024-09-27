@@ -1,0 +1,10 @@
+{
+    "gameWidth": 1280,
+    "gameHeight": 720,
+    "goalX": 1200,
+    "goalY": 360,
+    "printTrace": false,
+    "currentLevel": 1,
+    "outputFile": "simulation_level_{}_gen_{}.csv",
+    "simulateOnly": false
+}
