@@ -46,7 +46,7 @@ var (
 func LoadGameSettings() (GameSettings, error) {
 	var err error
 	once.Do(func() {
-		data, readErr := os.ReadFile("settings.json")
+		data, readErr := os.ReadFile("configs/settings.json")
 		if readErr != nil {
 			err = readErr
 			return
@@ -66,7 +66,7 @@ func LoadGameSettings() (GameSettings, error) {
 func LoadGeneticSettings() (GeneticSettings, error) {
 	var err error
 	geneticOnce.Do(func() {
-		data, readErr := os.ReadFile("genetic_settings.json")
+		data, readErr := os.ReadFile("configs/genetic_settings.json")
 		if readErr != nil {
 			err = readErr
 			return

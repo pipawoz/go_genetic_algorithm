@@ -1,6 +1,6 @@
 package engine
 
-import "github.com/pipawoz/go_genetic_algorithm/utils"
+import "github.com/pipawoz/go_genetic_algorithm/internal/utils"
 
 // SelectLevel selects the level based on the currentLevel parameter and returns the move limit and walls for that level.
 // The move limit determines the maximum number of moves allowed in the level.

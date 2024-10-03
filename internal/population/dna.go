@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/pipawoz/go_genetic_algorithm/utils"
+	"github.com/pipawoz/go_genetic_algorithm/internal/utils"
 )
 
 // DNA of the individual. It contains the genes of the individual.

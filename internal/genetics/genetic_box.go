@@ -1,13 +1,12 @@
 package genetics
 
 import (
-	"fmt"
 	"math/rand"
 	"reflect"
 	"sort"
 
-	"github.com/pipawoz/go_genetic_algorithm/population"
-	"github.com/pipawoz/go_genetic_algorithm/utils"
+	"github.com/pipawoz/go_genetic_algorithm/internal/population"
+	"github.com/pipawoz/go_genetic_algorithm/internal/utils"
 )
 
 // Genetic GeneticBox represents the genetic algorithm box.
@@ -15,33 +14,35 @@ var Genetic GeneticBox
 
 // GeneticBox represents the genetic algorithm box.
 type GeneticBox struct {
-	Crashed      bool
-	Won          bool
-	WonTime      int
-	Gene         population.DNA
-	Acceleration utils.Vector
-	Velocity     utils.Vector
-	// VelocityLimit  float32
+	Crashed        bool
+	Won            bool
+	WonTime        int
+	Gene           population.DNA
+	Acceleration   utils.Vector
+	Velocity       utils.Vector
 	Fitness        float64
+	AvgFitness     float64
+	AvgDistance    int
 	PopulationSize int
 	Population     []population.Box
 }
 
-func NewGeneticBox() *GeneticBox {
+func NewGeneticBox(populationSize int) *GeneticBox {
 	g := &GeneticBox{}
-	g.Init(population.DNA{}, 1)
+	dna := &population.DNA{}
+	g.Init(dna, populationSize)
 	return g
 }
 
 // Init initializes the genetic box with the given DNA and population size.
-func (g *GeneticBox) Init(dna population.DNA, populationSize int) {
+func (g *GeneticBox) Init(dna *population.DNA, populationSize int) {
 	g.Crashed = false
 	g.Won = false
 	g.WonTime = 0
 
-	if dna.Chain == nil {
-		dna.NewDNA(nil)
-	}
+	// if dna.Chain == nil {
+	// 	dna.NewDNA(nil)
+	// }
 
 	g.PopulationSize = populationSize
 	g.Acceleration.X = 0
@@ -51,18 +52,26 @@ func (g *GeneticBox) Init(dna population.DNA, populationSize int) {
 	g.Fitness = 0
 
 	for i := 0; i < g.PopulationSize; i++ {
-		if populationSize == 1 {
-			g.Population = append(g.Population, population.Box{Genes: dna})
-		} else {
-			g.Population = append(g.Population, population.Box{})
-		}
+
+		individualDNA := population.DNA{}
+		individualDNA.NewDNA(nil) // Inicializa con genes aleatorios
+
+		// if dna.Chain == nil {
+		// }
+
+		// if populationSize == 1 {
+		// box := population.NewBox(dna)
+		// g.Population = append(g.Population, *box)
+		// } else {
+		box := population.NewBox(&individualDNA)
+		g.Population = append(g.Population, *box)
 	}
 }
 
 // GetBestBox Returns the best box in the population.
 func (g *GeneticBox) GetBestBox() population.Box {
-	for _, individual := range g.Population {
-		individual.CalculateFitness()
+	for i := range g.Population {
+		g.Population[i].CalculateFitness()
 	}
 
 	sort.Slice(g.Population, func(i, j int) bool {
@@ -74,53 +83,53 @@ func (g *GeneticBox) GetBestBox() population.Box {
 
 // GetAvgFitness Returns the average fitness of the population.
 func (g *GeneticBox) GetAvgFitness() float64 {
-	var avg float64
+	var sumFit float64 = 0
 
-	for _, individual := range g.Population {
-		individual.CalculateFitness()
+	// for i := range g.Population {
+	// 	g.Population[i].CalculateFitness()
+	// }
+
+	for i := range g.Population {
+		sumFit += g.Population[i].Fitness
 	}
 
-	for _, individual := range g.Population {
-		avg += individual.Fitness
+	return sumFit / float64(len(g.Population))
+}
+
+// GetAvgDistance Gets the average distance of the population.
+func (g *GeneticBox) GetAvgDistance() int {
+	var sumDist int = 0
+
+	// for i := range g.Population {
+	// 	g.Population[i].CalculateFitness()
+	// }
+
+	for i := range g.Population {
+		sumDist += int(g.Population[i].Dist)
+	}
+
+	return sumDist / len(g.Population)
+}
+
+// GetAvgTraveled Gets the average distance traveled by the population.
+func (g *GeneticBox) GetAvgTraveled() float64 {
+	var avg float64 = 0
+
+	for i := range g.Population {
+		g.Population[i].CalculateFitness()
+	}
+
+	for i := range g.Population {
+		avg += g.Population[i].Traveled
 	}
 
 	return avg / float64(len(g.Population))
 }
 
-// GetAvgDistance Gets the average distance of the population.
-func (g *GeneticBox) GetAvgDistance() int {
-	var avg int
-
-	for _, individual := range g.Population {
-		individual.CalculateFitness()
-	}
-
-	for _, individual := range g.Population {
-		avg += int(individual.Dist)
-	}
-
-	return avg / len(g.Population)
-}
-
-// GetAvgTraveled Gets the average distance traveled by the population.
-func (g *GeneticBox) GetAvgTraveled() int {
-	var avg int
-
-	for _, individual := range g.Population {
-		individual.CalculateFitness()
-	}
-
-	for _, individual := range g.Population {
-		avg += individual.Traveled
-	}
-
-	return avg / len(g.Population)
-}
-
 // Update Updates the genetic box.
-func (g *GeneticBox) Update() {
-	fmt.Println("Update")
-}
+// func (g *GeneticBox) Update() {
+// 	fmt.Println("Update")
+// }
 
 // NextGeneration Updates the population to the next generation.
 func (g *GeneticBox) NextGeneration() {
@@ -132,20 +141,23 @@ func (g *GeneticBox) NextGeneration() {
 	// of each individual to pass
 	// - Randomly choose individuals from the list, creating a new genetic pool, and add them to a list
 
-	for _, individual := range g.Population {
-		individual.CalculateFitness()
+	for i := range g.Population {
+		g.Population[i].CalculateFitness()
 	}
+
+	g.AvgFitness = g.GetAvgFitness()
+	g.AvgDistance = g.GetAvgDistance()
 
 	var newSelection = []population.Box{}
 
 	totalFitness := 0.0
-	for _, individual := range g.Population {
-		totalFitness += individual.Fitness
+	for i := range g.Population {
+		totalFitness += g.Population[i].Fitness
 	}
 
 	probabilityOfSelection := []float64{}
-	for _, individual := range g.Population {
-		probabilityOfSelection = append(probabilityOfSelection, individual.Fitness/totalFitness)
+	for i := range g.Population {
+		probabilityOfSelection = append(probabilityOfSelection, g.Population[i].Fitness/totalFitness)
 	}
 
 	for range g.Population {
@@ -167,7 +179,11 @@ func (g *GeneticBox) NextGeneration() {
 	// - Save the offspring in a new list, do not save the parents (they die)
 
 	crossoverList := []population.Box{}
-	for i := 0; i < g.PopulationSize; i += 2 {
+	for i := 1; i < g.PopulationSize; i += 2 {
+		if len(newSelection) < 2 {
+			break
+		}
+
 		parentA := newSelection[rand.Intn(len(newSelection))]
 		parentB := newSelection[rand.Intn(len(newSelection))]
 
@@ -185,15 +201,16 @@ func (g *GeneticBox) NextGeneration() {
 	// - Perform the mutation for each individual
 	// - Each individual will mutate a certain configurable percentage with a random probability
 
-	for _, individual := range crossoverList {
-		individual.Mutate()
-	}
-
-	// Reset all the individuals in the population
-	for _, individual := range g.Population {
-		individual.Reset()
+	for i := range crossoverList {
+		crossoverList[i].Mutate(i)
 	}
 
 	// Replace the population with the new generation
 	g.Population = crossoverList
+
+	// Reset all the individuals in the population
+	for i := range g.Population {
+		g.Population[i].Reset()
+	}
+
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/pipawoz/go_genetic_algorithm/genetics"
-	"github.com/pipawoz/go_genetic_algorithm/utils"
+	"github.com/pipawoz/go_genetic_algorithm/internal/genetics"
+	"github.com/pipawoz/go_genetic_algorithm/internal/utils"
 )
 
 var Ebiten *ebiten.Image

@@ -2,6 +2,6 @@
     "iterations": 5,
     "maxGenerations": 100,
     "populationSize": 200,
-    "mutationRate": 0.01,
-    "crossoverRate": 0.7
+    "mutationRate": 0.05,
+    "crossoverRate": 1
 }
