@@ -33,6 +33,7 @@ GO_GENETIC_ALGORITHM/
 │   │   └── dna.go
 │   └── utils/
 │       └── utils.go
+│       └── config.go
 ├── configs/
 │   ├── genetic_settings.json
 │   └── settings.json
@@ -98,11 +99,9 @@ The application can be configured using the JSON files located in the `configs/`
 
 ```json
 {
-    "GameWidth": 1280,
-    "GameHeight": 720,
-    "GoalX": 1240,
-    "GoalY": 360,
-    "GoalSize": 40
+    "printTrace": true,
+    "currentLevel": 5,
+    "simulateOnly": false
 }
 ```
 
@@ -110,19 +109,15 @@ The application can be configured using the JSON files located in the `configs/`
 
 ```json
 {
-    "PopulationSize": 50,
-    "MaxGenerations": 200,
-    "MutationRate": 0.01,
-    "CrossoverRate": 0.7,
-    "DNAChainLength": 1000
+    "iterations": 5,
+    "maxGenerations": 200,
+    "populationSize": 100,
+    "mutationRate": 0.05,
+    "crossoverRate": 1
 }
 ```
 
 You can adjust these settings to change the behavior of the simulation.
-
-## Controls
-
-- **Toggle Trails**: Press `T` to toggle the visualization of individual trails on or off during the simulation.
 
 ## Levels
 
