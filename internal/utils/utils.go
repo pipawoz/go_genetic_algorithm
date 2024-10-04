@@ -14,10 +14,6 @@ type Vector struct {
 
 // GameSettings represents the settings for the game.
 type GameSettings struct {
-	GameWidth    int    `json:"gameWidth"`
-	GameHeight   int    `json:"gameHeight"`
-	GoalX        int    `json:"goalX"`
-	GoalY        int    `json:"goalY"`
 	PrintTrace   bool   `json:"printTrace"`
 	CurrentLevel int    `json:"currentLevel"`
 	OutputFile   string `json:"outputFile"`
@@ -89,9 +85,3 @@ type Obstacle struct {
 	Width  int
 	Height int
 }
-
-// Draw draws the obstacle on the screen.
-// func (o *Obstacle) Draw(screen *ebiten.Image) {
-// 	// Draw Obstacle
-// 	// vector.StrokeLine(screen, float32(o.X), float32(o.Y), float32(o.X+o.Width), float32(o.Y), 1, color.White, false)
-// }

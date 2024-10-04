@@ -8,13 +8,14 @@ import (
 )
 
 // DNA of the individual. It contains the genes of the individual.
-// The genes are a sequence of random numbers that represent the path
 type DNA struct {
 	Chain []utils.Vector
-	// Array []utils.Vector
 }
 
 // NewDNA creates a new DNA object with the given genes
+// If genes is nil, it will create a new DNA object with random genes
+// If genes is not nil, it will create a new DNA object with the given genes
+// The genes are a sequence of random numbers that represent the path
 func (dna *DNA) NewDNA(genes []utils.Vector) *DNA {
 	if genes != nil {
 		dna.Chain = genes

@@ -1,7 +1,6 @@
 package population
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -11,6 +10,7 @@ import (
 	"github.com/pipawoz/go_genetic_algorithm/internal/utils"
 )
 
+// Box represents an individual in the population.
 type Box struct {
 	IsAlive      bool
 	AliveTime    int
@@ -39,7 +39,7 @@ func NewBox(genes *DNA) *Box {
 	return &Box{
 		IsAlive:      true,
 		AliveTime:    0,
-		Position:     utils.Vector{X: 10, Y: float32(utils.Settings.GameHeight) / 2},
+		Position:     utils.Vector{X: 10, Y: float32(utils.GameHeight) / 2},
 		Size:         5,
 		Fitness:      0,
 		Won:          false,
@@ -52,6 +52,7 @@ func NewBox(genes *DNA) *Box {
 	}
 }
 
+// SetGenes sets the genes of the Box.
 func (box *Box) SetGenes(genes []utils.Vector) {
 	box.Genes.NewDNA(genes)
 }
@@ -63,9 +64,9 @@ func (box *Box) SetGenes(genes []utils.Vector) {
 // Returns: none.
 func (box *Box) CheckCollision(walls []utils.Obstacle) {
 	// Check if the box is out of the game boundaries
-	if int(box.Position.X)+box.Size > utils.Settings.GameWidth ||
+	if int(box.Position.X)+box.Size > utils.GameWidth ||
 		box.Position.X < -5 || box.Position.Y < -5 || int(box.Position.Y)+
-		box.Size > utils.Settings.GameHeight {
+		box.Size > utils.GameHeight {
 		box.IsAlive = false
 	}
 
@@ -80,20 +81,24 @@ func (box *Box) CheckCollision(walls []utils.Obstacle) {
 
 // CalculateFitness calculates the fitness of the box based on its position, distance to the goal, and other factors.
 // It updates the Fitness field of the box.
+// Returns: none.
 func (box *Box) CalculateFitness() {
+	goalSize := 40
+	goalX := 1280 - goalSize - 10
+	goalY := (720 / 2) - (goalSize / 2)
+
 	// Calculate the fitness of the box
-	box.Dist = math.Sqrt(math.Pow(float64(box.Position.X-float32(utils.Settings.GoalX)), 2) +
-		math.Pow(float64(box.Position.Y-float32(utils.Settings.GoalY)), 2))
+	box.Dist = math.Sqrt(math.Pow(float64(box.Position.X-float32(goalX)), 2) +
+		math.Pow(float64(box.Position.Y-float32(goalY)), 2))
 
-	box.Fitness = 1 - (box.Dist / float64(utils.Settings.GameWidth))
+	box.Fitness = 1 - (box.Dist / float64(utils.GameWidth))
 
-	// if box.IsAlive {
-	// 	box.Fitness *= 1.5
-	// }
+	if box.IsAlive {
+		box.Fitness *= 1.5
+	}
 
 	if box.Won {
-
-		// TODO: Cambiar por movelimit
+		// TODO: Replace with movelimit
 		efficiency := 700 / box.Frames
 		box.Fitness *= (2 * float64(efficiency))
 	}
@@ -103,7 +108,7 @@ func (box *Box) CalculateFitness() {
 func (box *Box) Reset() {
 	box.IsAlive = true
 	box.Position.X = 10
-	box.Position.Y = float32(utils.Settings.GameHeight) / 2
+	box.Position.Y = float32(utils.GameHeight) / 2
 	box.Velocity = utils.Vector{X: 0, Y: 0}
 	box.Acceleration = utils.Vector{X: 0, Y: 0}
 	box.Won = false
@@ -115,13 +120,6 @@ func (box *Box) Reset() {
 }
 
 // Update updates the state of the Box.
-// If the Box has reached the goal, it sets the Frames and Won properties,
-// stops the Box's movement, and marks it as not alive.
-// It also replaces the remaining genes with no-ops.
-// The Box's acceleration is determined by the current frame of the game.
-// The Box's velocity is updated based on its acceleration.
-// The Box's position is updated based on its velocity.
-// The Traveled property is updated based on the distance traveled by the Box.
 func (box *Box) Update(counter int) {
 	if !box.IsAlive {
 		box.Frames = counter
@@ -131,12 +129,9 @@ func (box *Box) Update(counter int) {
 	boxRect := image.Rect(int(box.Position.X), int(box.Position.Y),
 		int(box.Position.X)+box.Size, int(box.Position.Y)+box.Size)
 
-	// Definir tamaño del objetivo
 	goalSize := 40
-	// Calcular la posición del objetivo
-	goalX := 1280 - goalSize - 10       // 10 píxeles de margen desde el borde derecho
-	goalY := (720 / 2) - (goalSize / 2) // Centrado verticalmente
-	// winRect := image.Rect(go, 80, utils.Settings.GoalX+40, utils.Settings.GoalY-40)
+	goalX := 1280 - goalSize - 10
+	goalY := (720 / 2) - (goalSize / 2)
 	winRect := image.Rect(goalX, goalY, goalX+goalSize, goalY+goalSize)
 
 	if boxRect.Overlaps(winRect) && !box.Won {
@@ -145,11 +140,10 @@ func (box *Box) Update(counter int) {
 		box.Velocity = utils.Vector{X: 0, Y: 0}
 		box.Acceleration = utils.Vector{X: 0, Y: 0}
 		box.IsAlive = false
-		// box.Color = color.RGBA{R: 0, G: 255, B: 0, A: 255}
 
 		// Replace the remaining genes with no-ops
 		for i := range box.Genes.Chain[box.Frames+1:] {
-			box.Genes.Chain[box.Frames+1+i] = utils.Vector{X: 0, Y: 0} // Replace with nop's
+			box.Genes.Chain[box.Frames+1+i] = utils.Vector{X: 0, Y: 0}
 		}
 	}
 
@@ -162,18 +156,6 @@ func (box *Box) Update(counter int) {
 	box.Velocity.X += box.Acceleration.X
 	box.Velocity.Y += box.Acceleration.Y
 
-	// # Hago unos ajustes por temas visuales
-	// self.velLimit = 6
-
-	// if self.vel.x > self.velLimit and self.acc.x > 0:
-	//     self.vel.x = self.velLimit
-	// if self.vel.x < -self.velLimit and self.acc.x < 0:
-	//     self.vel.x = -self.velLimit
-	// if self.vel.y > self.velLimit and self.acc.y > 0:
-	//     self.vel.y = self.velLimit
-	// if self.vel.y < -self.velLimit and self.acc.y < 0:
-	//     self.vel.y = -self.velLimit
-
 	box.Position.X += box.Velocity.X
 	box.Position.Y += box.Velocity.Y
 
@@ -184,10 +166,9 @@ func (box *Box) Update(counter int) {
 // Mutate applies mutation to the Box's genes based on the mutation rate specified in the settings.
 // If the mutation rate is met, a random gene in the Box's gene chain is selected and its X or Y value is multiplied by 1.01.
 // The mutation quantity is set to 1 by default.
-func (box *Box) Mutate(i int) {
+func (box *Box) Mutate() {
 	randomValue := rand.Float64()
 	if randomValue < utils.DNASettings.MutationRate {
-		fmt.Println("Mutating: ", i)
 		mutationQuantity := 1
 		for i := 0; i < mutationQuantity; i++ {
 			index := rand.Int() % (len(box.Genes.Chain) - 1)
@@ -201,6 +182,10 @@ func (box *Box) Mutate(i int) {
 }
 
 // Crossover applies crossover to the Box's genes based on the crossover rate specified in the settings.
+// If the crossover rate is met, the Box's genes are crossed with the partner's genes.
+// The crossover point is randomly selected.
+// The new genes are created by combining the genes of the Box and the partner.
+// Returns: two new Box objects with the new genes.
 func (box *Box) Crossover(partner Box) (Box, Box) {
 	if rand.Float64() < utils.DNASettings.CrossoverRate {
 		newGenes1 := make([]utils.Vector, len(box.Genes.Chain))

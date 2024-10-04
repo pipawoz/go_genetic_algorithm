@@ -85,10 +85,6 @@ func (g *GeneticBox) GetBestBox() population.Box {
 func (g *GeneticBox) GetAvgFitness() float64 {
 	var sumFit float64 = 0
 
-	// for i := range g.Population {
-	// 	g.Population[i].CalculateFitness()
-	// }
-
 	for i := range g.Population {
 		sumFit += g.Population[i].Fitness
 	}
@@ -99,10 +95,6 @@ func (g *GeneticBox) GetAvgFitness() float64 {
 // GetAvgDistance Gets the average distance of the population.
 func (g *GeneticBox) GetAvgDistance() int {
 	var sumDist int = 0
-
-	// for i := range g.Population {
-	// 	g.Population[i].CalculateFitness()
-	// }
 
 	for i := range g.Population {
 		sumDist += int(g.Population[i].Dist)
@@ -126,15 +118,11 @@ func (g *GeneticBox) GetAvgTraveled() float64 {
 	return avg / float64(len(g.Population))
 }
 
-// Update Updates the genetic box.
-// func (g *GeneticBox) Update() {
-// 	fmt.Println("Update")
-// }
-
 // NextGeneration Updates the population to the next generation.
 func (g *GeneticBox) NextGeneration() {
 
-	// Selection: Calculate the probability of each individual to pass.
+	// Selection
+	// Calculate the probability of each individual to pass.
 	// More fit individuals have a higher probability of continuing to the next generation.
 	// - Calculate the fitness for all individuals
 	// - Calculate the total fitness of all individuals and then calculate the probability
@@ -200,9 +188,8 @@ func (g *GeneticBox) NextGeneration() {
 	// Mutation
 	// - Perform the mutation for each individual
 	// - Each individual will mutate a certain configurable percentage with a random probability
-
 	for i := range crossoverList {
-		crossoverList[i].Mutate(i)
+		crossoverList[i].Mutate()
 	}
 
 	// Replace the population with the new generation

@@ -1,7 +1,7 @@
 {
     "iterations": 5,
-    "maxGenerations": 100,
-    "populationSize": 200,
+    "maxGenerations": 200,
+    "populationSize": 100,
     "mutationRate": 0.05,
     "crossoverRate": 1
 }
