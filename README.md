@@ -60,7 +60,7 @@ GO_GENETIC_ALGORITHM/
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/go_genetic_algorithm.git
+git clone https://github.com/pipawoz/go_genetic_algorithm.git
 cd go_genetic_algorithm
 ```
 
